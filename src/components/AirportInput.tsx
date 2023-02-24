@@ -27,7 +27,7 @@ type AirportOption = {
 
 type Props = {
   placeholder: string;
-  onSelect: (selectedAirport: string) => void;
+  onSelect: (airportCode: string) => void;
 };
 
 const AirportInput: React.FC<Props> = ({ placeholder, onSelect }) => {
@@ -50,7 +50,7 @@ const AirportInput: React.FC<Props> = ({ placeholder, onSelect }) => {
   return (
     <AutoComplete
       options={options}
-      style={{ width: 200 }}
+      style={{ width: "100%" }}
       onSelect={onSelect}
       onSearch={onSearch}
       placeholder={placeholder}
