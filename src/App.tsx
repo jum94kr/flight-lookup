@@ -3,27 +3,12 @@ import "antd-button-color/dist/css/style.css";
 import React, { useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import {
-  DatePicker,
-  Form,
-  Empty,
-  List,
-  Row,
-  Col,
-  Divider,
-  Typography,
-} from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import Button from "antd-button-color";
-import AirportInput from "./components/AirportInput";
+import { Empty, List, Divider, Typography } from "antd";
 
-const { Title, Text } = Typography;
+import Toolbar, { FormValues } from "./components/Toolbar";
+import FlightListItem from "./components/FlightListItem";
 
-type FormValues = {
-  departureAirport: string;
-  arrivalAirport: string;
-  departureDate: string;
-};
+const { Title } = Typography;
 
 type FlightType = {
   codeshare: {
@@ -46,7 +31,7 @@ type FlightType = {
   };
 };
 
-type FormattedFlightType = {
+export type FormattedFlightType = {
   flightNumber: string;
   departureTime: string;
   arrivalTime: string;
@@ -55,7 +40,6 @@ type FormattedFlightType = {
 const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [flightData, setFlightData] = useState<FlightType[]>([]);
-  const [form] = Form.useForm();
 
   const formattedFlightData: FormattedFlightType[] = flightData
     .filter((flight) => !!flight?.codeshare?.comment050)
@@ -111,81 +95,11 @@ const App: React.FC = () => {
     <Body>
       <Header level={2}>FLIGHT SCHEDULE</Header>
 
-      <Form form={form} onFinish={onSubmit} validateTrigger="onSubmit">
-        <Row gutter={8}>
-          <Col span={12}>
-            {/* Departure Airport Input */}
-            <FormItem
-              name="departureAirport"
-              rules={[
-                {
-                  required: true,
-                  message: "Departure airport input is required",
-                },
-              ]}
-            >
-              <AirportInput
-                onSelect={(airportCode) =>
-                  form.setFieldValue("departureAirport", airportCode)
-                }
-                placeholder="Select departure airport"
-              />
-            </FormItem>
-          </Col>
-
-          <Col span={12}>
-            {/* Arrival Airport Input */}
-            <FormItem
-              name="arrivalAirport"
-              rules={[
-                {
-                  required: true,
-                  message: "Arrival airport input is required",
-                },
-              ]}
-            >
-              <AirportInput
-                onSelect={(airportCode) =>
-                  form.setFieldValue("arrivalAirport", airportCode)
-                }
-                placeholder="Select arrival airport"
-              />
-            </FormItem>
-          </Col>
-        </Row>
-
-        <Row gutter={8}>
-          <Col span={12}>
-            {/* Date Input */}
-            <FormItem
-              name="departureDate"
-              rules={[
-                { required: true, message: "Departure date input is required" },
-              ]}
-              valuePropName="date"
-            >
-              <DatePicker
-                onChange={(date, dateString) =>
-                  form.setFieldValue("departureDate", dateString)
-                }
-                style={{ width: "100%" }}
-              />
-            </FormItem>
-          </Col>
-        </Row>
-
-        {/* Submit Button */}
-        <ButtonWrapper>
-          <Button htmlType="submit" type="success" loading={loading}>
-            <SearchOutlined />
-            Search
-          </Button>
-        </ButtonWrapper>
-      </Form>
+      <Toolbar loading={loading} onSubmit={onSubmit} />
 
       <Divider />
 
-      <ResultWrapper>
+      <ListContainer>
         {flightData.length > 0 ? (
           <List
             bordered
@@ -195,26 +109,10 @@ const App: React.FC = () => {
         ) : (
           <Empty />
         )}
-      </ResultWrapper>
+      </ListContainer>
     </Body>
   );
 };
-
-type FlightListItemProps = {
-  flight: FormattedFlightType;
-};
-
-const FlightListItem: React.FC<FlightListItemProps> = ({ flight }) => (
-  <List.Item>
-    <ListItemContent>
-      <FlightNumberText type="success">{flight.flightNumber}</FlightNumberText>
-
-      {flight.departureTime}
-      {" - "}
-      {flight.arrivalTime}
-    </ListItemContent>
-  </List.Item>
-);
 
 const Header = styled(Title)`
   display: flex;
@@ -229,28 +127,8 @@ const Body = styled.div`
   max-width: 600px;
 `;
 
-const FormItem = styled(Form.Item)`
-  margin-bottom: 16px;
-`;
-
-const ResultWrapper = styled.div`
+const ListContainer = styled.div`
   margin-top: 40px;
-`;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-const FlightNumberText = styled(Text)`
-  margin-right: 24px;
-  font-weight: bold;
-`;
-
-const ListItemContent = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
 `;
 
 export default App;
